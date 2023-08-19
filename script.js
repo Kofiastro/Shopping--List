@@ -22,9 +22,10 @@ const container = document.querySelector('#item-form')
 const inputy = document.querySelector('.form-input');
 const AddButton = container.querySelector('.btn');
 const itemz = document.querySelector('.items');
-const listy = document.querySelectorAll('li')
+const listy = itemz.querySelectorAll('li')
 const icon = itemz.querySelector('i');
 const clearBtn = document.querySelector('.btn-clear')
+const filter=document.querySelector('.filter');
 
 
 
@@ -76,7 +77,15 @@ function ClearAll(e) {
     }
 }
 
+function checkUI(){
+    const listy = itemz.querySelectorAll('li')
+    if(listy.length===''){
+        
+    }
+}
+
 //Add Event listeners
 itemz.addEventListener('click', RemoveItems);
 AddButton.addEventListener('click', AddItems);
 clearBtn.addEventListener('click', ClearAll)
+ checkUI();
