@@ -17,15 +17,12 @@
 //Function to clear all items when click on the clear all button
 
 
-
 const container = document.querySelector('#item-form')
 const inputy = document.querySelector('.form-input');
 const AddButton = container.querySelector('.btn');
 const itemz = document.querySelector('.items');
-const listy = itemz.querySelectorAll('li')
-const icon = itemz.querySelector('i');
-const clearBtn = document.querySelector('.btn-clear')
-const filter=document.querySelector('.filter');
+const clearBtn = document.querySelector('.btn-clear');
+const filter = document.querySelector('#filter');
 
 
 
@@ -38,6 +35,7 @@ function AddItems(e) {
     }
     itemz.appendChild(CreateListItem());
     inputy.value = '';
+
 }
 
 function CreateListItem() {
@@ -66,26 +64,51 @@ function RemoveItems(e) {
     if (e.target.parentElement.classList.contains('remove-item')) {
         if (confirm('Are you sure you want to delete')) {
             e.target.parentElement.parentElement.remove();
+            checkUI();
         }
     }
+
 }
 
 function ClearAll(e) {
     while (itemz.firstChild) {
         itemz.removeChild(itemz.firstChild);
+    }
+    checkUI();
+}
 
+
+function FilterItem(e) {
+    const itemz = document.querySelectorAll('li');
+    const text = e.target.value.toLowerCase();
+    itemz.forEach((item) => {
+       const inputy = item.firstChild.textContent.toLowerCase();
+        if (inputy.indexOf(text) !=-1) {
+            item.style.display = 'flex';
+        }
+        else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+
+function checkUI() {
+    const listy = itemz.querySelectorAll('li');
+    if (listy.length === 0) {
+        clearBtn.style.display = 'none';
+        filter.style.display = 'none';
+    }
+    else {
+        clearBtn.style.display = 'block';
+        filter.style.display = 'block';
     }
 }
 
-function checkUI(){
-    const listy = itemz.querySelectorAll('li')
-    if(listy.length===''){
-        
-    }
-}
 
 //Add Event listeners
 itemz.addEventListener('click', RemoveItems);
 AddButton.addEventListener('click', AddItems);
-clearBtn.addEventListener('click', ClearAll)
- checkUI();
+clearBtn.addEventListener('click', ClearAll);
+filter.addEventListener('input', FilterItem);
+checkUI();
