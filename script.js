@@ -16,64 +16,112 @@
 //FUnction ot remove items when clicked on the x icon 
 //Function to clear all items when click on the clear all button
 
-
-const container = document.querySelector('#item-form')
 const inputy = document.querySelector('.form-input');
-const AddButton = container.querySelector('.btn');
+const AddButton = document.querySelector('#item-form');
 const itemz = document.querySelector('.items');
 const clearBtn = document.querySelector('.btn-clear');
 const filter = document.querySelector('#filter');
 
 
-
-function AddItems(e) {
+function displayItems() {
+    const itemFromStorage = getitemFromStorage();
+    itemFromStorage.forEach((itemz) => addItemToDOM(itemz));
+    checkUI();
+}
+function onaddItemsSubmit(e) {
     e.preventDefault();
-    const vaLue = inputy.value;
-    if (vaLue === '') {
-        alert('Please Input an item');
+    inputItem = inputy.value;
+    if (inputItem === '') {
+        alert('Please input an item');
         return;
     }
-    itemz.appendChild(CreateListItem());
+    //crating item DOM
+    addItemToDOM(inputItem);
+    //Add item tostorage
+    addItemtoStorage(inputItem);
+    checkUI();
     inputy.value = '';
 
 }
+function addItemtoStorage(item) {
+    const itemFromStorage = getitemFromStorage();
 
-function CreateListItem() {
-    const li = document.createElement('li');
-    const vaLue = inputy.value;
-    NewItm = document.createTextNode(vaLue);
-    li.appendChild(NewItm);
-    li.appendChild(CreateButton());
-    return li;
+    itemFromStorage.push(item);
+
+    //Convert to json string and set to LocalStorage
+    localStorage.setItem('items', JSON.stringify(itemFromStorage));
 }
 
-function CreateButton() {
+function getitemFromStorage() {
+    let itemFromStorage;
+    if (localStorage.getItem('items') === null) {
+        itemFromStorage = [];
+    }
+    else {
+        itemFromStorage = JSON.parse(localStorage.getItem('items'));
+    }
+
+    return itemFromStorage;
+}
+function addItemToDOM(item) {
+    const li = document.createElement('li');
+    NewItm = document. createTextNode(item);
+    li.appendChild(NewItm);
+    buttonCreate = CreateButton('remove-item btn-link text-red');
+    li.appendChild(buttonCreate);
+    itemz.appendChild(li);
+}
+
+function CreateButton(classes) {
     const Button = document.createElement('button');
-    Button.className = 'remove-item btn-link text-red';
-    Button.appendChild(icony());
+    Button.className = classes;
+    addICon = icony('fa-solid fa-xmark');
+    Button.appendChild(addICon);
     return Button;
 }
 
-function icony() {
+function icony(classes) {
     const icon = document.createElement('i');
-    icon.className = 'fa-solid fa-xmark';
+    icon.className = classes;
     return icon;
 }
 
-function RemoveItems(e) {
+
+function onClickRemove(e){
     if (e.target.parentElement.classList.contains('remove-item')) {
-        if (confirm('Are you sure you want to delete')) {
-            e.target.parentElement.parentElement.remove();
-            checkUI();
+          RemoveItems(e.target.parentElement.parentElement);
         }
+}
+
+function RemoveItems(item) {
+    if (confirm('Are you sure you want to Remove')) {
+        //Remove item from DOM
+        item.remove()
+
+        //remove item from storage
+        removeItemfromStorage(item.textContent);
+        checkUI();
     }
+}
+
+function removeItemfromStorage(item){
+    let itemFromStorage=getitemFromStorage();
+    // Filter out items
+    itemFromStorage=itemFromStorage.filter((i)=> i !==item);
+
+
+    // Re-set to local Storage
+    localStorage.setItem('items',JSON.stringify(itemFromStorage));
 
 }
+
 
 function ClearAll(e) {
     while (itemz.firstChild) {
         itemz.removeChild(itemz.firstChild);
     }
+    //Clear from local storage
+    localStorage.removeItem('items');
     checkUI();
 }
 
@@ -82,8 +130,8 @@ function FilterItem(e) {
     const itemz = document.querySelectorAll('li');
     const text = e.target.value.toLowerCase();
     itemz.forEach((item) => {
-       const inputy = item.firstChild.textContent.toLowerCase();
-        if (inputy.indexOf(text) !=-1) {
+        const inputy = item.firstChild.textContent.toLowerCase();
+        if (inputy.indexOf(text) != -1) {
             item.style.display = 'flex';
         }
         else {
@@ -107,8 +155,12 @@ function checkUI() {
 
 
 //Add Event listeners
-itemz.addEventListener('click', RemoveItems);
-AddButton.addEventListener('click', AddItems);
-clearBtn.addEventListener('click', ClearAll);
-filter.addEventListener('input', FilterItem);
-checkUI();
+function init() {
+    AddButton.addEventListener('submit', onaddItemsSubmit)
+    itemz.addEventListener('click', onClickRemove);
+    clearBtn.addEventListener('click', ClearAll);
+    filter.addEventListener('input', FilterItem);
+    document.addEventListener('DOMContentLoaded', displayItems);
+    checkUI();
+}
+init();
